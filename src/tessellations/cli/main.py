@@ -7,9 +7,11 @@ from typing import Literal
 
 from tessellations.core.generator import TessellationGenerator
 from tessellations.core.svg_generator import SVGTessellationGenerator
+from tessellations.core.complex_svg_generator import ComplexSVGTessellationGenerator
 from tessellations.utils.file import generate_filename, get_output_path
 
 FileFormat = Literal["svg", "png"]
+PatternComplexity = Literal["simple", "complex"]
 
 def parse_args():
     """Parse command-line arguments."""
@@ -23,9 +25,20 @@ def parse_args():
     parser.add_argument(
         "--pattern", 
         type=str, 
-        choices=["triangular", "square", "hexagonal"], 
+        choices=[
+            "triangular", "square", "hexagonal",
+            "islamic_stars", "penrose", "celtic_knots",
+            "floral", "escher"
+        ], 
         default="hexagonal",
         help="Type of tessellation pattern to generate"
+    )
+    parser.add_argument(
+        "--complexity",
+        type=str,
+        choices=["simple", "complex"],
+        default="simple",
+        help="Complexity level of the pattern (simple uses basic patterns, complex uses advanced patterns)"
     )
     parser.add_argument(
         "--size", 
@@ -46,40 +59,14 @@ def parse_args():
         default="svg",
         help="Output file format (svg or png)"
     )
-    return parser.parse_args()
-
-def main():
-    """Main entry point for the tessellation generator."""
-    args = parse_args()
-    
-    print("Tessellations Generator")
-    print(f"Current time: {datetime.now()}")
-    
-    # Generate filename and output path
-    filename = generate_filename(args.pattern, args.format)
-    output_path = get_output_path(args.output_dir, filename)
-    
-    print(f"Generating {args.pattern} tessellation...")
-    print(f"Size: {args.size}x{args.size} pixels")
-    print(f"Line width: {args.line_width} pixels")
-    print(f"Format: {args.format}")
-    
-    # Generate the tessellation
-    if args.format == "svg":
-        generator = SVGTessellationGenerator(
-            size=args.size, 
-            line_width=args.line_width
-        )
-    else:  # PNG
-        generator = TessellationGenerator(
-            size=args.size, 
-            line_width=int(args.line_width)
-        )
-    
-    output_file = generator.generate(args.pattern, output_path)
-    
-    print(f"Tessellation generated and saved to: {output_file}")
-    return 0
-
-if __name__ == "__main__":
-    sys.exit(main())
+    parser.add_argument(
+        "--stroke-color",
+        type=str,
+        default="#000000",
+        help="Color of the lines in the tessellation (hex format)"
+    )
+    parser.add_argument(
+        "--background-color",
+        type=str,
+        default="#FFFFFF",
+        help="Background color of the image (hex format)"
