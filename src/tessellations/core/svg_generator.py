@@ -1,6 +1,6 @@
 """SVG generator for tessellation patterns."""
 from pathlib import Path
-from typing import List, Literal, Tuple, Union
+from typing import Literal, Tuple
 import math
 
 PatternType = Literal["triangular", "square", "hexagonal"]
