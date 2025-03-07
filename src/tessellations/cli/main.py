@@ -70,3 +70,54 @@ def parse_args():
         type=str,
         default="#FFFFFF",
         help="Background color of the image (hex format)"
+    )
+    return parser.parse_args()
+
+def main():
+    """Main entry point for the tessellation generator."""
+    args = parse_args()
+    
+    print("Tessellations Generator")
+    print(f"Current time: {datetime.now()}")
+    
+    # Generate filename and output path
+    filename = generate_filename(args.pattern, args.format)
+    output_path = get_output_path(args.output_dir, filename)
+    
+    print(f"Generating {args.pattern} tessellation...")
+    print(f"Complexity: {args.complexity}")
+    print(f"Size: {args.size}x{args.size} pixels")
+    print(f"Line width: {args.line_width} pixels")
+    print(f"Format: {args.format}")
+    
+    # Generate the tessellation
+    if args.format == "svg":
+        if args.complexity == "complex" or args.pattern in [
+            "islamic_stars", "penrose", "celtic_knots", "floral", "escher"
+        ]:
+            # Complex patterns require the ComplexSVGTessellationGenerator
+            generator = ComplexSVGTessellationGenerator(
+                size=args.size, 
+                line_width=args.line_width,
+                stroke_color=args.stroke_color,
+                background_color=args.background_color
+            )
+        else:
+            # Simple patterns can use the regular SVGTessellationGenerator
+            generator = SVGTessellationGenerator(
+                size=args.size, 
+                line_width=args.line_width
+            )
+    else:  # PNG
+        generator = TessellationGenerator(
+            size=args.size, 
+            line_width=int(args.line_width)
+        )
+    
+    output_file = generator.generate(args.pattern, output_path)
+    
+    print(f"Tessellation generated and saved to: {output_file}")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
