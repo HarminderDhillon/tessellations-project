@@ -1,0 +1,9 @@
+services:
+  tessellations:
+    build: .
+    volumes:
+      - .:/app
+      - ~/Documents/tessellations:/app/output
+    environment:
+      - PYTHONPATH=/app
+    command: tessellate --output-dir /app/output
