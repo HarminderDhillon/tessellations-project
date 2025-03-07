@@ -6,4 +6,4 @@ services:
       - ~/Documents/tessellations:/app/output
     environment:
       - PYTHONPATH=/app
-    command: tessellate --output-dir /app/output
+    command: tessellate --output-dir /app/output --format svg

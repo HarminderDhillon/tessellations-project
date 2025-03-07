@@ -2,9 +2,11 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Union
+from typing import Literal, Union
 
-def generate_filename(pattern_type: str, extension: str = "png") -> str:
+FileFormat = Literal["svg", "png"]
+
+def generate_filename(pattern_type: str, extension: FileFormat = "svg") -> str:
     """
     Generate a filename based on the pattern type and current timestamp.
     
