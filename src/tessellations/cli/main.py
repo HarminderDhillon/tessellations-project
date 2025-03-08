@@ -8,6 +8,7 @@ from typing import Literal
 from tessellations.core.generator import TessellationGenerator
 from tessellations.core.svg_generator import SVGTessellationGenerator
 from tessellations.core.complex_svg_generator import ComplexSVGTessellationGenerator
+from tessellations.core.islamic_pattern_generator import IslamicPatternGenerator
 from tessellations.utils.file import generate_filename, get_output_path
 
 FileFormat = Literal["svg", "png"]
@@ -27,7 +28,8 @@ def parse_args():
         type=str, 
         choices=[
             "triangular", "square", "hexagonal",
-            "islamic_stars", "penrose", "celtic_knots",
+            "islamic_stars", "islamic_eight_fold", "islamic_ten_fold", "islamic_twelve_fold",
+            "penrose", "celtic_knots",
             "floral", "escher"
         ], 
         default="hexagonal",
@@ -91,7 +93,20 @@ def main():
     print(f"Format: {args.format}")
     
     # Generate the tessellation
-    if args.format == "svg":
+    if args.pattern in ["islamic_eight_fold", "islamic_ten_fold", "islamic_twelve_fold"]:
+        # Extract the pattern type from the pattern name
+        pattern_type = args.pattern.replace("islamic_", "")
+        
+        # Use the IslamicPatternGenerator for specific Islamic patterns
+        generator = IslamicPatternGenerator(
+            size=args.size,
+            line_width=args.line_width,
+            stroke_color=args.stroke_color,
+            background_color=args.background_color,
+            pattern_type=pattern_type
+        )
+        output_file = generator.generate(Path(output_path))
+    elif args.format == "svg":
         if args.complexity == "complex" or args.pattern in [
             "islamic_stars", "penrose", "celtic_knots", "floral", "escher"
         ]:
@@ -108,13 +123,13 @@ def main():
                 size=args.size, 
                 line_width=args.line_width
             )
+        output_file = generator.generate(args.pattern, output_path)
     else:  # PNG
         generator = TessellationGenerator(
             size=args.size, 
             line_width=int(args.line_width)
         )
-    
-    output_file = generator.generate(args.pattern, output_path)
+        output_file = generator.generate(args.pattern, output_path)
     
     print(f"Tessellation generated and saved to: {output_file}")
     return 0
