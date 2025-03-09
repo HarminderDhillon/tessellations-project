@@ -351,23 +351,16 @@ class ComplexSVGTessellationGenerator:
                 x = col * cell_size
                 y = row * cell_size
                 
-                # Alternate between different knot patterns
-                pattern = (row + col) % 4
-                if pattern == 0:
-                    self._draw_celtic_knot_element1(svg, x, y, cell_size)
-                elif pattern == 1:
-                    self._draw_celtic_knot_element2(svg, x, y, cell_size)
-                elif pattern == 2:
-                    self._draw_celtic_knot_element3(svg, x, y, cell_size)
-                else:
-                    self._draw_celtic_knot_element4(svg, x, y, cell_size)
+                # Draw a basic Celtic knot element
+                svg = self._draw_celtic_knot_element(svg, x, y, cell_size)
         
+        # Close the group and SVG
         svg += '</g>\n'
         svg += self._svg_footer()
         
         return svg
     
-    def _draw_celtic_knot_element1(self, svg, x, y, size):
+    def _draw_celtic_knot_element(self, svg, x, y, size):
         """Draw a Celtic knot element with curved corners."""
         # Curve radius
         r = size / 4
@@ -391,82 +384,8 @@ class ComplexSVGTessellationGenerator:
         # Add decorative elements
         center = (x + size/2, y + size/2)
         svg += f'  <circle cx="{center[0]}" cy="{center[1]}" r="{r/2}" />\n'
-    
-    def _draw_celtic_knot_element2(self, svg, x, y, size):
-        """Draw a Celtic knot element with interlaced loops."""
-        # Center and dimensions
-        center_x = x + size/2
-        center_y = y + size/2
-        r = size * 0.4
         
-        # Draw interlocking circles
-        svg += f'  <circle cx="{center_x-size/6}" cy="{center_y}" r="{r/2}" />\n'
-        svg += f'  <circle cx="{center_x+size/6}" cy="{center_y}" r="{r/2}" />\n'
-        
-        # Draw arcs to connect them
-        svg += f'  <path d="M {center_x-size/6+r/2},{center_y} A {r},{r} 0 0,1 {center_x+size/6-r/2},{center_y}" />\n'
-        svg += f'  <path d="M {center_x+size/6-r/2},{center_y} A {r/2},{r/2} 0 0,0 {center_x+size/6+r/2},{center_y}" />\n'
-        svg += f'  <path d="M {center_x+size/6+r/2},{center_y} A {r},{r} 0 0,1 {center_x-size/6+r/2},{center_y}" />\n'
-    
-    def _draw_celtic_knot_element3(self, svg, x, y, size):
-        """Draw a Celtic knot element with a cross pattern."""
-        # Center of the cell
-        center_x = x + size/2
-        center_y = y + size/2
-        r = size * 0.4
-        
-        # Draw a cross shape
-        hwidth = size * 0.1  # half width of the cross arms
-        
-        points1 = [
-            f"{x+hwidth},{y+hwidth}",
-            f"{center_x-hwidth},{center_y-hwidth}",
-            f"{center_x+hwidth},{center_y-hwidth}",
-            f"{x+size-hwidth},{y+hwidth}",
-            f"{x+size-hwidth},{y+3*hwidth}",
-            f"{center_x+hwidth},{center_y-hwidth}",
-            f"{center_x+hwidth},{center_y+hwidth}",
-            f"{x+size-hwidth},{y+size-3*hwidth}",
-            f"{x+size-hwidth},{y+size-hwidth}",
-            f"{center_x+hwidth},{center_y+hwidth}",
-            f"{center_x-hwidth},{center_y+hwidth}",
-            f"{x+hwidth},{y+size-hwidth}",
-            f"{x+hwidth},{y+size-3*hwidth}",
-            f"{center_x-hwidth},{center_y+hwidth}",
-            f"{center_x-hwidth},{center_y-hwidth}",
-            f"{x+hwidth},{y+3*hwidth}"
-        ]
-        
-        svg += f'  <polygon points="{" ".join(points1)}" />\n'
-    
-    def _draw_celtic_knot_element4(self, svg, x, y, size):
-        """Draw a Celtic knot element with a spiral pattern."""
-        center_x = x + size/2
-        center_y = y + size/2
-        
-        # Draw a simple spiral using path commands
-        max_radius = size * 0.4
-        min_radius = size * 0.1
-        num_turns = 3
-        num_points = 40
-        
-        for start_angle in [0, math.pi]:
-            path = f'M '
-            
-            for i in range(num_points + 1):
-                t = i / num_points
-                radius = max_radius - (max_radius - min_radius) * t
-                angle = start_angle + num_turns * 2 * math.pi * t
-                
-                x_point = center_x + radius * math.cos(angle)
-                y_point = center_y + radius * math.sin(angle)
-                
-                if i == 0:
-                    path += f'{x_point},{y_point} '
-                else:
-                    path += f'L {x_point},{y_point} '
-            
-            svg += f'  <path d="{path}" />\n'
+        return svg
     
     def _generate_floral_pattern(self) -> str:
         """Generate a floral tessellation pattern as SVG."""
@@ -478,17 +397,15 @@ class ComplexSVGTessellationGenerator:
         # Create a grid of floral elements
         cell_size = self.size // 6
         
-        for row in range(7):
-            for col in range(7):
+        for row in range(6):
+            for col in range(6):
                 x = col * cell_size
                 y = row * cell_size
                 
-                # Add offset to alternating rows
-                if row % 2 == 1:
-                    x += cell_size / 2
-                
-                self._draw_floral_element(svg, x, y, cell_size)
+                # Draw a floral element
+                svg = self._draw_floral_element(svg, x, y, cell_size)
         
+        # Close the group and SVG
         svg += '</g>\n'
         svg += self._svg_footer()
         
@@ -534,6 +451,8 @@ class ComplexSVGTessellationGenerator:
             stamen_y = center_y + size * 0.15 * math.sin(angle)
             
             svg += f'  <circle cx="{stamen_x}" cy="{stamen_y}" r="{size * 0.02}" />\n'
+        
+        return svg
     
     def _generate_escher_pattern(self) -> str:
         """Generate an Escher-inspired tessellation pattern as SVG."""
@@ -542,27 +461,30 @@ class ComplexSVGTessellationGenerator:
         # Add a group for the pattern with styling
         svg += f'<g stroke="{self.stroke_color}" stroke-width="{self.line_width}" fill="none">\n'
         
-        # We'll create a simplified Escher-like pattern based on a grid
-        cell_size = self.size // 6
+        # Create a grid of Escher-like elements
+        # We'll use a simplified approach with transforming shapes
         
-        # Create a grid of alternating fish-like shapes
-        for row in range(6):
-            for col in range(6):
+        cell_size = self.size // 4
+        
+        for row in range(4):
+            for col in range(4):
                 x = col * cell_size
                 y = row * cell_size
                 
-                if (row + col) % 2 == 0:
-                    self._draw_escher_fish(svg, x, y, cell_size, "right")
-                else:
-                    self._draw_escher_fish(svg, x, y, cell_size, "left")
+                # Alternate the orientation
+                flip = 1 if (row + col) % 2 == 0 else -1
+                
+                # Draw an Escher-like element (simplified bird/fish)
+                svg = self._draw_escher_element(svg, x, y, cell_size, flip)
         
+        # Close the group and SVG
         svg += '</g>\n'
         svg += self._svg_footer()
         
         return svg
     
-    def _draw_escher_fish(self, svg, x, y, size, direction):
-        """Draw an Escher-inspired fish shape."""
+    def _draw_escher_element(self, svg, x, y, size, flip):
+        """Draw an Escher-inspired element."""
         # Fish body parameters
         body_width = size * 0.8
         body_height = size * 0.5
@@ -572,7 +494,7 @@ class ComplexSVGTessellationGenerator:
         center_y = y + size / 2
         
         # Direction determines the orientation of the fish
-        flip = -1 if direction == "left" else 1
+        flip = -1 if flip == -1 else 1
         
         # Draw the fish body (simplified as a curved shape)
         fish_path = f"M {center_x - flip*body_width/2},{center_y} "
@@ -598,3 +520,5 @@ class ComplexSVGTessellationGenerator:
         tail_y3 = center_y + body_height * 0.4
         
         svg += f'  <path d="M {tail_x1},{tail_y1} L {tail_x2},{tail_y2} L {tail_x3},{tail_y3} Z" />\n'
+        
+        return svg
