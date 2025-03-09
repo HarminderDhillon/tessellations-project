@@ -1,9 +1,6 @@
 """SVG generator for tessellation patterns."""
 from pathlib import Path
-from typing import Literal, Tuple
 import math
-
-PatternType = Literal["triangular", "square", "hexagonal"]
 
 class SVGTessellationGenerator:
     """Generator for SVG tessellation patterns."""
@@ -23,7 +20,7 @@ class SVGTessellationGenerator:
     
     def generate(
         self, 
-        pattern_type: PatternType, 
+        pattern_type: str, 
         output_path: Path
     ) -> Path:
         """
@@ -36,15 +33,12 @@ class SVGTessellationGenerator:
         Returns:
             Path to the generated SVG file
         """
-        # Generate the SVG content based on pattern type
-        if pattern_type == "triangular":
-            svg_content = self._generate_triangular_pattern()
-        elif pattern_type == "square":
-            svg_content = self._generate_square_pattern()
-        elif pattern_type == "hexagonal":
-            svg_content = self._generate_hexagonal_pattern()
-        else:
-            raise ValueError(f"Unknown pattern type: {pattern_type}")
+        # Only hexagonal pattern is supported
+        if pattern_type != "hexagonal":
+            raise ValueError(f"This generator only supports hexagonal pattern, got: {pattern_type}")
+        
+        # Generate the SVG content
+        svg_content = self._generate_hexagonal_pattern()
         
         # Ensure the output directory exists
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -67,54 +61,6 @@ class SVGTessellationGenerator:
     def _svg_footer(self) -> str:
         """Generate SVG footer."""
         return '</svg>'
-    
-    def _generate_triangular_pattern(self) -> str:
-        """Generate a triangular tessellation pattern as SVG."""
-        svg = self._svg_header()
-        
-        # Add a group for the pattern with styling
-        svg += f'<g stroke="{self.stroke_color}" stroke-width="{self.line_width}" fill="none">\n'
-        
-        cell_size = self.size // 10
-        
-        # Draw horizontal lines
-        for i in range(0, self.size + 1, cell_size):
-            svg += f'  <line x1="0" y1="{i}" x2="{self.size}" y2="{i}" />\n'
-        
-        # Draw diagonal lines (/)
-        for i in range(-self.size, self.size + 1, cell_size):
-            svg += f'  <line x1="0" y1="{i + self.size}" x2="{self.size}" y2="{i}" />\n'
-        
-        # Draw diagonal lines (\)
-        for i in range(-self.size, self.size + 1, cell_size):
-            svg += f'  <line x1="0" y1="{i}" x2="{self.size}" y2="{i + self.size}" />\n'
-        
-        svg += '</g>\n'
-        svg += self._svg_footer()
-        
-        return svg
-    
-    def _generate_square_pattern(self) -> str:
-        """Generate a square tessellation pattern as SVG."""
-        svg = self._svg_header()
-        
-        # Add a group for the pattern with styling
-        svg += f'<g stroke="{self.stroke_color}" stroke-width="{self.line_width}" fill="none">\n'
-        
-        cell_size = self.size // 10
-        
-        # Draw horizontal lines
-        for i in range(0, self.size + 1, cell_size):
-            svg += f'  <line x1="0" y1="{i}" x2="{self.size}" y2="{i}" />\n'
-        
-        # Draw vertical lines
-        for i in range(0, self.size + 1, cell_size):
-            svg += f'  <line x1="{i}" y1="0" x2="{i}" y2="{self.size}" />\n'
-        
-        svg += '</g>\n'
-        svg += self._svg_footer()
-        
-        return svg
     
     def _generate_hexagonal_pattern(self) -> str:
         """Generate a hexagonal tessellation pattern as SVG."""
